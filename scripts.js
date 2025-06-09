@@ -83,11 +83,20 @@ function playGame(player1, player2) {
 
 function main() {
 
-    const name1 = prompt("Player 1 name? ");
+    const output = document.querySelector("#output");
+    const record = document.querySelector("#record");
+    const p1_name = document.querySelector("#p1").value;
+    const p2_name = document.querySelector("#p2").value;
+
+    output.textContent = "Name for player1?"
+    const name1 = p1_name || "Player 1";
     const player1 = player(name1, "x");
 
-    const name2 = prompt("Player 2 name? ");
+    output.textContent = "Name for player2?"
+    const name2 = p2_name || "Player 2";
     const player2 = player(name2, "o");
+
+    output.textContent = "Good luck!";
 
     const game = playGame(player1, player2);
     let isGoing = true;
@@ -106,9 +115,10 @@ function main() {
             console.log(`${current_player.name} is the winner!`);
             const p1_wins = player1.getWins();
             const p2_wins = player2.getWins();
+            record.textContent = `${p1_wins}: ${p2_wins}`;
             console.log(`Current record is ${player1.name}:${p1_wins} - ${player2.name}:${p2_wins}`);
 
-            const playAgain = prompt("Play again? Type y");
+            output.textContent = "Play again?";
             if (playAgain!="y") {
                 isGoing = false
             } else {
