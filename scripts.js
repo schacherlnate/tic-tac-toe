@@ -36,7 +36,7 @@ function gameBoard() {
     const resetBoard = function() {
         for (let i = 0; i<9; i++) {
             gameArr[i]=null;
-            const cell = gameDisplay.children[pos];
+            const cell = gameDisplay.children[i];
             cell.textContent="";
         }
         numFilled = 0;
@@ -120,3 +120,14 @@ function main() {
     }
     console.log("good game!");
 }
+
+const startButton = document.querySelector("#start");
+startButton.addEventListener("click", ()=>main());
+
+const resetButton = document.querySelector("#reset");
+resetButton.addEventListener("click", ()=>{
+    const gameWrapper = document.querySelector(".gameWrapper");
+    for (let i = 0; i<9; i++) {
+        gameWrapper.children[i].textContent = "";
+    }
+});

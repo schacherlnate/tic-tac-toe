@@ -3,15 +3,27 @@ html {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-*, *::before, *::afteer {
+*, *::before, *::after {
     box-sizing: inherit;
     background-color: inherit;
     color: inherit;
     font-family: inherit;
 }
 
+body {
+
+}
+
 .gameWrapper {
     display: grid;
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(3, 100px);
+}
+
+#start, #reset, #output {
+    border: 1px solid white;
+    background-color: blue;
+    color: white;
+    padding: 8px;
+    width: fit-content;
 }
