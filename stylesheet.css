@@ -1,0 +1,17 @@
+html {
+    box-sizing: border-box;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+*, *::before, *::afteer {
+    box-sizing: inherit;
+    background-color: inherit;
+    color: inherit;
+    font-family: inherit;
+}
+
+.gameWrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
