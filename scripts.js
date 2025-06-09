@@ -3,6 +3,7 @@ function gameBoard() {
                    null, null, null,
                    null, null, null];
     let numFilled = 0;
+    const gameDisplay = document.querySelector(".gameWrapper");
     
     const getValue = function(pos) {
         return gameArr[pos];
@@ -11,6 +12,8 @@ function gameBoard() {
     const setValue = function(pos, val) {
         gameArr[pos] = val;
         numFilled++;
+        const cell = gameDisplay.children[pos];
+        cell.textContent = val;
     }
 
     const isDone = function(move) {
@@ -33,6 +36,8 @@ function gameBoard() {
     const resetBoard = function() {
         for (let i = 0; i<9; i++) {
             gameArr[i]=null;
+            const cell = gameDisplay.children[pos];
+            cell.textContent="";
         }
         numFilled = 0;
     }
@@ -77,6 +82,7 @@ function playGame(player1, player2) {
 }
 
 function main() {
+
     const name1 = prompt("Player 1 name? ");
     const player1 = player(name1, "x");
 
