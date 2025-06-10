@@ -10,16 +10,66 @@ html {
     font-family: inherit;
 }
 
-.gameWrapper {
-    display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(3, 100px);
+.big-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
 }
 
-#start, #reset, #output {
+h1 {
+    font-size: 3.25rem;
+}
+
+.gameWrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 150px);
+    grid-template-rows: repeat(3, 150px);
+}
+
+#start, #reset {
     border: 1px solid white;
     background-color: blue;
     color: white;
     padding: 8px;
     width: fit-content;
+}
+
+#output {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    width: 25em;
+    height: 2em;
+}
+
+.gameCell {
+    border: 1px solid black;
+    display: grid;
+    align-items:center;
+    justify-content: center;
+    font-size: 80px;
+}
+
+.userBtns {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    gap: 10px;
+    width: 450px;
+    font-size: 1.25rem;
+}
+
+.names {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+
+.name-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 450px;
 }

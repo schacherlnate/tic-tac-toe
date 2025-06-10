@@ -1,7 +1,5 @@
 const gameBoard = (() => {
-    const gameArr = [null, null, null,
-                   null, null, null,
-                   null, null, null];
+    const gameArr = Array(9).fill("");
     let numFilled = 0;
     
     const getValue = function(pos) {
@@ -35,17 +33,17 @@ function player(name, marker) {
 const gameController = (() => {
     let player1, player2, isDone, current_player = false;
 
-    const startGame = function(name1, name2) {
+    const startGame = (name1, name2) => {
         player1 = player(name1 || "player1", "x");
         player2 = player(name2 || "player 2", "o");
         current_player = player1;
         isDone = false;
         gameBoard.resetBoard();
         gameDisplay.makeCells();
-        gameDisplay.sendMsg(`${current_player}'s turn`);
+        gameDisplay.sendMsg(`${current_player.name}'s turn`);
     }
 
-    const playTurn = function(index) {
+    const playTurn = (index) => {
         if (isDone || !gameBoard.setValue(index, current_player.marker)) return
 
         gameDisplay.updateCell(index, current_player.marker);
@@ -56,21 +54,21 @@ const gameController = (() => {
             return
         }
 
-        if (gameController.checkWinner()) {
+        if (gameController.checkWinner(index)) {
             isDone = true;
-            gameDisplay.sendMsg(`${current_player} is the winner!`);
+            gameDisplay.sendMsg(`${current_player.name} is the winner!`);
             return
         }
 
         current_player = current_player == player1 ? player2 : player1;
-        gameDisplay.sendMsg(`${current_player}'s turn`);
+        gameDisplay.sendMsg(`${current_player.name}'s turn`);
     }
 
-    const checkTie = function() {
+    const checkTie = () => {
         return gameBoard.numFilled == 9
     }
 
-    const checkWinner = function(move) {
+    const checkWinner = (move) => {
         const marker = gameBoard.getValue(move);
         const i = Math.floor(move / 3);
         const j = move % 3;
@@ -85,11 +83,11 @@ const gameController = (() => {
     }
 
     const resetGame = function() {
-        if (!player1) return
-        gameController.startGame();
+        if (!player1 || !player2) return
+        gameController.startGame(player1.name, player2.name);
     }
 
-    return {startGame, playTurn, checkTie, checkWinner, resetGame};
+    return {startGame, playTurn, resetGame, checkWinner, checkTie};
 })();
 
 // Acts as the interface between the user and the game logic
@@ -100,9 +98,10 @@ const gameDisplay = (() => {
     // Makes 9 responsive game cells that call playGame() funtions when clicked
     const makeCells = function() {
         gameWrapper.innerHTML = ""; // will clear existing cells if game already played
-        gameBoard.gameArr.forEach((pos)=>{
+        gameBoard.gameArr.forEach((val, pos)=>{
             const newCell = document.createElement("div");
-            newCell.textContent = "";
+            newCell.textContent = val;
+            newCell.classList.add("gameCell");
             newCell.addEventListener("click", ()=>{
                 gameController.playTurn(pos);
             });
@@ -133,8 +132,5 @@ startButton.addEventListener("click", ()=>{
 
 const resetButton = document.querySelector("#reset");
 resetButton.addEventListener("click", ()=>{
-    const gameWrapper = document.querySelector(".gameWrapper");
-    for (let i = 0; i<9; i++) {
-        gameWrapper.children[i].textContent = "";
-    }
+    gameController.resetGame();
 });

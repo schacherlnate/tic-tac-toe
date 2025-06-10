@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", ()=>{
+/* document.addEventListener("DOMContentLoaded", ()=>{
     const gameWrapper = document.querySelector(".gameWrapper");
     for (let idx = 0; idx < 9; idx++) {
         let newCell = document.createElement("div");
@@ -25,4 +25,4 @@ document.addEventListener("DOMContentLoaded", ()=>{
         })
         gameWrapper.appendChild(newCell);
     }  
-});
+}); */
