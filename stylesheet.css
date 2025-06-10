@@ -10,10 +10,6 @@ html {
     font-family: inherit;
 }
 
-body {
-
-}
-
 .gameWrapper {
     display: grid;
     grid-template-columns: repeat(3, 100px);

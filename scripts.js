@@ -29,13 +29,7 @@ const gameBoard = (() => {
 })();
 
 function player(name, marker) {
-    let wins = 0;
-
-    const incrementWins = ()=>{wins++}
-
-    const getWins = ()=>{return wins}
-
-    return {name, marker, incrementWins, getWins}
+    return {name, marker}
 }
 
 const gameController = (() => {
@@ -48,6 +42,7 @@ const gameController = (() => {
         isDone = false;
         gameBoard.resetBoard();
         gameDisplay.makeCells();
+        gameDisplay.sendMsg(`${current_player}'s turn`);
     }
 
     const playTurn = function(index) {
@@ -56,12 +51,19 @@ const gameController = (() => {
         gameDisplay.updateCell(index, current_player.marker);
 
         if (gameController.checkTie()) {
-            isDone = true
+            isDone = true;
+            gameDisplay.sendMsg("Tied game");
+            return
         }
 
         if (gameController.checkWinner()) {
-            isDone = true
+            isDone = true;
+            gameDisplay.sendMsg(`${current_player} is the winner!`);
+            return
         }
+
+        current_player = current_player == player1 ? player2 : player1;
+        gameDisplay.sendMsg(`${current_player}'s turn`);
     }
 
     const checkTie = function() {
@@ -82,16 +84,22 @@ const gameController = (() => {
         return wonCol || wonRow || wonDiagonal
     }
 
-    const resetBoard = function() {
-        return game.resetBoard()
+    const resetGame = function() {
+        if (!player1) return
+        gameController.startGame();
     }
 
-    return {startGame, checkTie, checkWinner, updateBoard, isValid, isDone, printBoard, resetBoard, playTurn};
+    return {startGame, playTurn, checkTie, checkWinner, resetGame};
 })();
 
-const gameDisplay = (() => {
+// Acts as the interface between the user and the game logic
+const gameDisplay = (() => { 
     const gameWrapper = document.querySelector(".gameWrapper");
+    const output = document.querySelector("#output");
+
+    // Makes 9 responsive game cells that call playGame() funtions when clicked
     const makeCells = function() {
+        gameWrapper.innerHTML = ""; // will clear existing cells if game already played
         gameBoard.gameArr.forEach((pos)=>{
             const newCell = document.createElement("div");
             newCell.textContent = "";
@@ -102,66 +110,26 @@ const gameDisplay = (() => {
         })
     }
 
+    // When a user clicks a valid cell, that cells text content is updated with the user marker
     const updateCell = function(index, marker) {
         const cell = gameWrapper.children[index];
         cell.textContent = marker;
     }
 
-    return {makeCells, updateCell}
+    // Tells user info like game state (tied, won)
+    const sendMsg = function(msg) {
+        output.textContent = msg;
+    }
+
+    return {makeCells, updateCell, sendMsg}
 })();
 
-function main() {
-
-    const output = document.querySelector("#output");
-    const record = document.querySelector("#record");
-    const p1_name = document.querySelector("#p1").value;
-    const p2_name = document.querySelector("#p2").value;
-
-    output.textContent = "Name for player1?"
-    const name1 = p1_name || "Player 1";
-    const player1 = player(name1, "x");
-
-    output.textContent = "Name for player2?"
-    const name2 = p2_name || "Player 2";
-    const player2 = player(name2, "o");
-
-    output.textContent = "Good luck!";
-
-    const game = playGame(player1, player2);
-    let isGoing = true;
-    let current_player = player1;
-
-    while (isGoing) {
-        const next_move = prompt(`${current_player.name}'s turn to move`);
-        if (!game.isValid(next_move)) {
-            console.log("invalid move");
-            continue;
-        }
-
-        game.updateBoard(current_player, next_move);
-        if (game.isDone(next_move)) {
-            current_player.incrementWins();
-            console.log(`${current_player.name} is the winner!`);
-            const p1_wins = player1.getWins();
-            const p2_wins = player2.getWins();
-            record.textContent = `${p1_wins}: ${p2_wins}`;
-            console.log(`Current record is ${player1.name}:${p1_wins} - ${player2.name}:${p2_wins}`);
-
-            output.textContent = "Play again?";
-            if (playAgain!="y") {
-                isGoing = false
-            } else {
-                game.resetBoard();
-            }
-        }
-
-        current_player = current_player==player1 ? player2 : player1;
-    }
-    console.log("good game!");
-}
-
 const startButton = document.querySelector("#start");
-startButton.addEventListener("click", ()=>main());
+startButton.addEventListener("click", ()=>{
+    const name1 = document.querySelector("#p1").value;
+    const name2 = document.querySelector("#p2").value;
+    gameController.startGame(name1, name2);
+});
 
 const resetButton = document.querySelector("#reset");
 resetButton.addEventListener("click", ()=>{
