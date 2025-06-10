@@ -1,49 +1,32 @@
-function gameBoard() {
+const gameBoard = (() => {
     const gameArr = [null, null, null,
                    null, null, null,
                    null, null, null];
     let numFilled = 0;
-    const gameDisplay = document.querySelector(".gameWrapper");
     
     const getValue = function(pos) {
         return gameArr[pos];
     }
 
     const setValue = function(pos, val) {
+        if (gameArr[pos]) {
+            return false
+        }
+
         gameArr[pos] = val;
         numFilled++;
-        const cell = gameDisplay.children[pos];
-        cell.textContent = val;
-    }
-
-    const isDone = function(move) {
-        if (numFilled===9) {
-            return true
-        }
-        const marker = getValue(move);
-        const i = Math.floor(move / 3);
-        const j = move % 3;
-        const wonCol = gameArr[((i+1)*3+j)%9] == marker && gameArr[((i+2)*3+j)%9] == marker;
-        const wonRow = gameArr[i*3+(j+1)%3] == marker && gameArr[i*3+(j+2)%3] == marker;
-        let wonDiagonal = false;
-        if (move%2==0) {
-            wonDiagonal = gameArr[0] == marker && gameArr[4] == marker && gameArr[8] == marker;
-            wonDiagonal = wonDiagonal || (gameArr[2] == marker && gameArr[4] == marker && gameArr[6] == marker);
-        }
-        return wonCol || wonRow || wonDiagonal
-    }
+        return true
+    };
 
     const resetBoard = function() {
         for (let i = 0; i<9; i++) {
             gameArr[i]=null;
-            const cell = gameDisplay.children[i];
-            cell.textContent="";
         }
         numFilled = 0;
     }
 
-    return {gameArr, getValue, setValue, isDone, resetBoard};
-}
+    return {gameArr, getValue, setValue, resetBoard, numFilled};
+})();
 
 function player(name, marker) {
     let wins = 0;
@@ -55,31 +38,77 @@ function player(name, marker) {
     return {name, marker, incrementWins, getWins}
 }
 
-function playGame(player1, player2) {
-    const game = gameBoard();
+const gameController = (() => {
+    let player1, player2, isDone, current_player = false;
 
-    const isValid = function(move) {
-        return !(game.getValue(move))
+    const startGame = function(name1, name2) {
+        player1 = player(name1 || "player1", "x");
+        player2 = player(name2 || "player 2", "o");
+        current_player = player1;
+        isDone = false;
+        gameBoard.resetBoard();
+        gameDisplay.makeCells();
     }
 
-    const updateBoard = function(player, move) {
-        game.setValue(move, player.marker);
+    const playTurn = function(index) {
+        if (isDone || !gameBoard.setValue(index, current_player.marker)) return
+
+        gameDisplay.updateCell(index, current_player.marker);
+
+        if (gameController.checkTie()) {
+            isDone = true
+        }
+
+        if (gameController.checkWinner()) {
+            isDone = true
+        }
     }
 
-    const isDone = function(move) {
-        return game.isDone(move)
+    const checkTie = function() {
+        return gameBoard.numFilled == 9
     }
 
-    const printBoard = function() {
-        return game.gameArr
+    const checkWinner = function(move) {
+        const marker = gameBoard.getValue(move);
+        const i = Math.floor(move / 3);
+        const j = move % 3;
+        const wonCol = gameBoard.gameArr[((i+1)*3+j)%9] == marker && gameBoard.gameArr[((i+2)*3+j)%9] == marker;
+        const wonRow = gameBoard.gameArr[i*3+(j+1)%3] == marker && gameBoard.gameArr[i*3+(j+2)%3] == marker;
+        let wonDiagonal = false;
+        if (move%2==0) {
+            wonDiagonal = gameBoard.gameArr[0] == marker && gameBoard.gameArr[4] == marker && gameBoard.gameArr[8] == marker;
+            wonDiagonal = wonDiagonal || (gameBoard.gameArr[2] == marker && gameBoard.gameArr[4] == marker && gameBoard.gameArr[6] == marker);
+        }
+        return wonCol || wonRow || wonDiagonal
     }
 
     const resetBoard = function() {
         return game.resetBoard()
     }
 
-    return {updateBoard, isValid, isDone, printBoard, resetBoard};
-}
+    return {startGame, checkTie, checkWinner, updateBoard, isValid, isDone, printBoard, resetBoard, playTurn};
+})();
+
+const gameDisplay = (() => {
+    const gameWrapper = document.querySelector(".gameWrapper");
+    const makeCells = function() {
+        gameBoard.gameArr.forEach((pos)=>{
+            const newCell = document.createElement("div");
+            newCell.textContent = "";
+            newCell.addEventListener("click", ()=>{
+                gameController.playTurn(pos);
+            });
+            gameWrapper.appendChild(newCell);
+        })
+    }
+
+    const updateCell = function(index, marker) {
+        const cell = gameWrapper.children[index];
+        cell.textContent = marker;
+    }
+
+    return {makeCells, updateCell}
+})();
 
 function main() {
 
